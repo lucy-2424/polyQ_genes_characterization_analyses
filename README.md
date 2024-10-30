@@ -11,10 +11,10 @@ This contains the R and BASH scripts, results and data required for the analyses
 
 -`results/`: Contains figures generated from the analyses for the current study. 
 
--`scr/`: Contains scripts used in the analysis and to generate figures.
+- `scr/`: Contains scripts used in the analysis and to generate figures.
  - `R/`:
-  - `1_polyq_analyses.R`: code to curate the polyglutamine gene-associated traits from the Open Targets Genetics database, perform gene-related analyses and generate figures. 
-  - `2_polyq_druggability_analyses.R`: code to perform polyglutamine gene druggability-related analysis and generate figures.
-  - `3_polyq_annotation_analyses.R`: code to generate data set used to retrieve the annotations of the variants associated with the polyglutamine trait associations.
+   - `1_polyq_analyses.R`: code to curate the polyglutamine gene-associated traits from the Open Targets Genetics database, perform gene-related analyses and generate figures.
+   - `2_polyq_druggability_analyses.R`: code to perform polyglutamine gene druggability-related analysis and generate figures.
+   - `3_polyq_annotation_analyses.R`: code to generate data set used to retrieve the annotations of the variants associated with the polyglutamine trait associations.
  - `bash/`:
-  - `1_polyq_otg_annotation.sh`: code to retrieve annotations of the variants associated with the polyglutamine gene-trait associations using Ensemble Variant Effect predictor.
+   -`1_polyq_otg_annotation.sh`: code to retrieve annotations of the variants associated with the polyglutamine gene-trait associations using Ensemble Variant Effect predictor.
