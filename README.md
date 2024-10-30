@@ -1,5 +1,5 @@
 # Project
-This contains the R and BASH scripts, results and data required for the analyses performed for **"Unbiased genomic characterization of human traits associated with polyglutamine disease genes to inform therapeutic strategies."**
+This contains the R and BASH scripts and data required for the analyses performed for **"Unbiased genomic characterization of human traits associated with polyglutamine disease genes to inform therapeutic strategies."**
 
 ## Directory Structure
 - `data/`: Contains data used for analyses. Some data sets are restricted and have not been included in the folder. 
