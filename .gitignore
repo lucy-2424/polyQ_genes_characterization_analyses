@@ -1,0 +1,16 @@
+plots/*
+data/l2g_combined_annot.txt
+data/l2g_combined_annot.vcf
+data/l2g_combined_annot.vcf_summary.html
+data/l2g_combined_no_annot.txt
+data/l2g_combined_no_annot.vcf
+data/l2g_combined_no_annot_sorted.vcf
+data/polyQ_disorders_2023.xlsx
+src/R/2023_lucy_polyq_annotate.R
+src/R/2023_lucy_polyq_automated.R
+src/R/2023_lucy_polyq_plots.R
+src/R/2023_lucy_polyq_trial_plots.R
+src/R/2024_lucy_polyq_category_heatmap.R
+src/R/2024_lucy_polyq_druggability_temp.R
+src/R/2024_lucy_polyq_molecular_interactors_ref.R
+src/R/2024_lucy_polyq_phewas_analysis.R
