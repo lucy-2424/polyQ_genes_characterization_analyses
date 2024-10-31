@@ -11,8 +11,8 @@ library(viridisLite)
 library(viridis)
 
 # Load the polyq data 
-l2g_combined <- fread("/research/2023_polyQ/otg/data/polyQ_otg_29_09-23.tsv")
-polyQ_disorder_genes <- read_excel("/research/2023_polyQ/otg/data/polyQ_disorders_2023.xlsx",sheet = "Sheet1")
+l2g_combined <- fread("/research/2023_polyQ/data/polyQ_otg_29_09-23.tsv")
+polyQ_disorder_genes <- read_excel("/research/2023_polyQ/data/polyQ_disorders_2023.xlsx",sheet = "Sheet1")
 
 # Get ensemble polyq gene IDs
 ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl", archive=FALSE, verbose=TRUE)
@@ -37,11 +37,11 @@ l2g_combined_vep <- l2g_combined %>%
                   variant.altAllele))
 
 # Save the file to retrieve annotations from ensembl vep
-write.table(l2g_combined_vep, "/research/2023_polyQ/otg/data/l2g_combined_no_annot.txt", quote = F, row.names = F)
+write.table(l2g_combined_vep, "/research/2023_polyQ/data/l2g_combined_no_annot.txt", quote = F, row.names = F)
 
 ## Retrieve annotations using VEP in bash
 # Load annotated data
-l2g_combined_annotated <- fread("/research/2023_polyQ/otg/data/l2g_combined_annot.txt")
+l2g_combined_annotated <- fread("/research/2023_polyQ/data/l2g_combined_annot.txt")
 
 # Select on the required columns 
 l2g_combined_annotated <- l2g_combined_annotated %>%
@@ -221,7 +221,7 @@ plot_gene(
   position = 3150000,
   gene_name = "HTT", 
   chr_position = "Chromosome 4 position (GRCh38)", 
-  output_path = "/research/2023_polyQ/otg/results/polyq_genes_htt_annotated_associations.pdf"
+  output_path = "/research/2023_polyQ/results/polyq_genes_htt_annotated_associations.pdf"
 )
 
 plot_gene(
@@ -231,7 +231,7 @@ plot_gene(
   position = 16400000,
   gene_name = "ATXN1", 
   chr_position = "Chromosome 6 position (GRCh38)", 
-  output_path = "/research/2023_polyQ/otg/results/polyq_genes_atxn1_annotated_associations.pdf"
+  output_path = "/research/2023_polyQ/results/polyq_genes_atxn1_annotated_associations.pdf"
 )
 
 plot_gene(
@@ -241,7 +241,7 @@ plot_gene(
   position = 111500000,
   gene_name = "ATXN2", 
   chr_position = "Chromosome 12 position (GRCh38)", 
-  output_path = "/research/2023_polyQ/otg/results/polyq_genes_atxn2_annotated_associations.pdf"
+  output_path = "/research/2023_polyQ/results/polyq_genes_atxn2_annotated_associations.pdf"
 )
 
 plot_gene(
@@ -251,7 +251,7 @@ plot_gene(
   xmin = 63863155, xmax = 64003462, 
   gene_name = "ATXN7", 
   chr_position = "Chromosome 3 position (GRCh38)", 
-  output_path = "/research/2023_polyQ/otg/results/polyq_genes_atxn7_annotated_associations.pdf"
+  output_path = "/research/2023_polyQ/results/polyq_genes_atxn7_annotated_associations.pdf"
 )
 
 plot_gene(
@@ -261,5 +261,5 @@ plot_gene(
   position = 13400000,
   gene_name = "CACNA1A", 
   chr_position = "Chromosome 19 position (GRCh38)", 
-  output_path = "/research/2023_polyQ/otg/results/polyq_genes_cacna1a_annotated_associations.pdf"
+  output_path = "/research/2023_polyQ/results/polyq_genes_cacna1a_annotated_associations.pdf"
 )

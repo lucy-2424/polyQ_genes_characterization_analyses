@@ -23,14 +23,16 @@ polyq_genes_info <- dplyr::filter(gnomad_select, gene %in% polyq_genes)
 # Plot the gnomAD information
 polyq_genes_info %>%
   ggplot(aes(x = -oe_lof, y = pLI)) +
-  geom_point() + theme_bw() +
+  geom_point(aes(color = gene), size = 3) + theme_bw() +
+  scale_color_manual(values=c("THAP11" = "#addc30","TBP" ="#fde725","ATN1" = "#5ec962", "ATXN7" = "#28ae80", "ATXN3" = "#21918c","ATXN1" = "#2c728e",
+                             "CACNA1A" = "#3b528b","HTT" = "#472d7b","ATXN2" = "#440154"))+
   geom_hline(yintercept = 0.9, linetype = "dotted", color = "red") + 
   annotate("text", x = -0.3, y = 0.9, label = "pLI = 0.9", vjust = -1, color = "red") +  
-  ggrepel::geom_text_repel(aes(label = gene), size = 3, fontface = "bold.italic") + 
+  ggrepel::geom_text_repel(aes(label = gene, color = gene), size = 3, fontface = "bold.italic") + 
   labs(x = "gnomAD -(observed/expected ratio LoF)", y = "gnomADpLI") +
   theme(legend.position = "none",
         axis.text = element_text(size = 12, face = "bold")) 
-ggsave("/research/2023_polyQ/otg/results/polyq_genes_gnomad.pdf", height=4.50, width=5.36, units='in')
+ggsave("/research/2023_polyQ/results/polyq_genes_gnomad.pdf", height=4.50, width=5.36, units='in')
 
 # Read in protein atlas information
 protein_atlas <- fread("/research/references/protein_atlas/proteinatlas.tsv", na.strings = "")
@@ -62,13 +64,13 @@ polyq_genes_info_summary %>%
         panel.grid = element_blank(), # Remove the gid
         legend.position = "none") +  # Remove legend
   labs(x = "RNA Tissue Specificity", y = "")
-ggsave("/research/2023_polyQ/otg/results/polyq_genes_tissue_specificity.pdf", height=5.58, width=6.58, units='in')
+ggsave("/research/2023_polyQ/results/polyq_genes_tissue_specificity.pdf", height=5.58, width=6.58, units='in')
 rm(polyq_genes_info_summary)
 
 # Assess and add interaction data from Open Targets
 # Subset high quality (mi score greater than 0.42)
 # Threshold based on https://doi.org/10.1101/2023.02.07.23285407
-otg_interactors <- fread("/research/2023_polyQ/otg/data/polyQ_genes_molecular_interactions_interactors.txt")
+otg_interactors <- fread("/research/2023_polyQ/data/polyQ_genes_molecular_interactions_interactors.txt")
 
 polyq_int_high_q_count <- otg_interactors %>%
   dplyr::filter(score>0.42) %>% 
@@ -88,8 +90,8 @@ polyq_genes_info <- polyq_genes_info %>%
 # Plot molecular interaction information
 polyq_int_high_q_count %>%
   mutate(name = fct_reorder(gene, int_0.42_count)) %>%
-  ggplot(aes(x=name, y=int_0.42_count)) +
-  geom_bar(stat="identity", fill="#189AB4", width=.9) +
+  ggplot(aes(x=name, y=int_0.42_count, fill = gene)) +
+  geom_bar(stat="identity", width=.9) +
   geom_text(aes(label=int_0.42_count),
             hjust = -0.1, 
             size = 3,
@@ -100,12 +102,18 @@ polyq_int_high_q_count %>%
   annotate("text", x = 11.9, y = 173, size = 3,
            label = "10 interactions", angle = 15, vjust = 1, hjust = 1, color = "black", fontface = "bold") +
   theme(axis.text.y = element_text(face = "bold.italic"),
-        axis.text.x = element_text(face = "bold"),) +
+        axis.text.x = element_text(face = "bold"),
+        legend.position = "none") +
+  scale_fill_manual(values = c(
+    "THAP11" = "#addc30", "TBP" = "#fde725", "ATN1" = "#5ec962",
+    "ATXN7" = "#28ae80", "ATXN3" = "#21918c", "ATXN1" = "#2c728e",
+    "CACNA1A" = "#3b528b", "HTT" = "#472d7b", "ATXN2" = "#440154"
+  )) +
   coord_flip() 
-ggsave("/research/2023_polyQ/otg/results/polyq_genes_interactors.pdf", height=4.36, width=6.36, units='in')
+ggsave("/research/2023_polyQ/results/polyq_genes_interactors.pdf", height=4.36, width=6.36, units='in')
 
 # Read in Druggable Genome Information (https://www.dgidb.org/, analyzed 23 July 2024)
-dgib <- fread("/research/2023_polyQ/otg/data/categories_dgidb_2024_07_23.tsv")
+dgib <- fread("/research/2023_polyQ/data/categories_dgidb_2024_07_23.tsv")
 
 # Change the column names 
 dgib <- dgib %>%
@@ -196,6 +204,6 @@ polyq_genes_info_heatmap %>%
   theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
   scale_y_discrete(labels = c("Interacting Partners", "RNA tissue specificity", "pLi tolerance", "Druggable any"))
 
-ggsave("/research/2023_polyQ/otg/results/polyq_genes_druggability.pdf", height=5.36, width=7.58*0.8, units='in')
+ggsave("/research/2023_polyQ/results/polyq_genes_druggability.pdf", height=5.36, width=7.58*0.8, units='in')
 
 

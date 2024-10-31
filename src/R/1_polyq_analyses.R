@@ -91,7 +91,7 @@ fetch_l2g <- function(current_geneId) {
 colnames(result_df)
 
 # Load the polyQ gene information
-polyQ_disorder_genes <- read_excel("/research/2023_polyQ/otg/data/polyQ_disorders_2023.xlsx",sheet = "Sheet1")
+polyQ_disorder_genes <- read_excel("/research/2023_polyQ/data/polyQ_disorders_2023.xlsx",sheet = "Sheet1")
 
 # Retreive the ensembl ids for the polyQ genes
 ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl", archive=FALSE, verbose=TRUE)
@@ -117,8 +117,8 @@ colnames(l2g_combined) <- gsub("yProbaModel", "L2G", colnames(l2g_combined))
 
 # Save the polyQ otg data
 # Data was downloaded on 29th September 2023
-write.table(l2g_combined, file = "/research/2023_polyQ/otg/data/polyQ_otg_29_09-23.tsv", sep = "\t", row.names = FALSE)
-l2g_combined <- fread("/research/2023_polyQ/otg/data/polyQ_otg_29_09-23.tsv")
+write.table(l2g_combined, file = "/research/2023_polyQ/data/polyQ_otg_29_09-23.tsv", sep = "\t", row.names = FALSE)
+l2g_combined <- fread("/research/2023_polyQ/data/polyQ_otg_29_09-23.tsv")
 
 # Filter for high confidence associations (remove count based, etc)
 l2g_combined_select <- l2g_combined %>% 
@@ -164,7 +164,7 @@ l2g_combined_sig %>%
         axis.title.y = element_text(size = 10, face="bold")) +
   coord_cartesian(ylim = c(0, 75))
 
-ggsave("/research/2023_polyQ/otg/results/polyq_genes_l2g_significant_associations.pdf", height=5.36, width=5.36, units='in')
+ggsave("/research/2023_polyQ/results/polyq_genes_l2g_significant_associations.pdf", height=5.36, width=5.36, units='in')
 
 ## Plot the measurement category vs other categories 
 measure <- l2g_combined_sig %>%
@@ -183,7 +183,7 @@ measure %>%
         legend.position = "bottom",
         legend.title = element_blank())
 
-ggsave("/research/2023_polyQ/otg/results/polyq_genes_l2g_sig_measure_propotion.pdf", height=5.36, width=5.36, units='in')
+ggsave("/research/2023_polyQ/results/polyq_genes_l2g_sig_measure_propotion.pdf", height=5.36, width=5.36, units='in')
 
 ## Plot an L2G heatmap showing distinct non-measurement categories for each gene
 heatmap <- l2g_combined_sig %>%
@@ -225,7 +225,7 @@ ggplot(heatmap, aes(x = symbol, y = study.traitCategory, fill = total_trait_cate
   labs(fill = "Total Categories") +
   coord_fixed()
 
-ggsave("/research/2023_polyQ/otg/results/polyq_genes_l2g_sig_heatmap.pdf", height=4.36, width=5.36, units='in')
+ggsave("/research/2023_polyQ/results/polyq_genes_l2g_sig_heatmap.pdf", height=4.36, width=5.36, units='in')
 
 ## Plot the network graph
 # Create the dataframe to use for the network
@@ -277,7 +277,7 @@ edge_weights <- apply(edge_df, 1, function(x) sum(x[1] %in% sorted_nodes) + sum(
 arc_widths <- (edge_weights - min(edge_weights)) / (max(edge_weights) - min(edge_weights)) * 2 + 1
 
 # Open a PDF device
-pdf("/research/2023_polyQ/otg/results/polyq_genes_l2g_sig_network.pdf", height=4.86, width=6.00) 
+pdf("/research/2023_polyQ/results/polyq_genes_l2g_sig_network.pdf", height=4.86, width=6.00) 
 
 # Plot the network graph
 arcplot(edge_df, col.arcs = hsv(0, 0, 0.2, 0.25),
@@ -301,7 +301,7 @@ ggplot(l2g_combined_select_sig, aes(fct_infreq(symbol,), fill = symbol)) +
         axis.title.x = element_text(face = "bold", size = 10),
         legend.position = "none") 
 
-ggsave("/research/2023_polyQ/otg/results/polyq_genes_l2g_high_confidence_associations.pdf", height=5.36, width=5.36, units='in')
+ggsave("/research/2023_polyQ/results/polyq_genes_l2g_high_confidence_associations.pdf", height=5.36, width=5.36, units='in')
 
 ## Plot polyQ Lollipop for the significant associations 
 # Reformat and take out the excess wording from the traits 
@@ -353,4 +353,4 @@ current %>%
         plot.title = element_text(hjust = 0.5),
         legend.position = "right")
 
-ggsave("/research/2023_polyQ/otg/results/polyq_genes_l2g_significant_lollipop.pdf", height=5.36, width=8.36, units='in')
+ggsave("/research/2023_polyQ/results/polyq_genes_l2g_significant_lollipop.pdf", height=5.36, width=8.36, units='in')
