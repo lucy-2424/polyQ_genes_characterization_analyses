@@ -118,7 +118,7 @@ atxn7 <- l2g_combined_merge %>%
 cacna1a <- l2g_combined_merge %>%
   dplyr::filter(symbol == "CACNA1A")
 
-# Reformat the dataframe for plotting 
+# Reformat and take out the excess wording from the traits
 l2g_combined_merge$study.traitReported <- gsub(" \\[EA\\])", "", l2g_combined_merge$study.traitReported)
 l2g_combined_merge$study.traitReported <- gsub(" \\(years of education\\)", "", l2g_combined_merge$study.traitReported)
 l2g_combined_merge$study.traitReported <- gsub(" \\(special factor of neuroticism\\)", "", l2g_combined_merge$study.traitReported)

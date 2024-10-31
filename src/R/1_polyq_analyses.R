@@ -110,7 +110,6 @@ for (gene in query_genes) {
 }
 
 # Clean and rename the column names
-colnames(polyq_gene_info)
 colnames(l2g_combined)
 colnames(l2g_combined) <- gsub("studiesAndLeadVariantsForGeneByL2G.", "", colnames(l2g_combined))
 colnames(l2g_combined) <- gsub("geneInfo.", "", colnames(l2g_combined))
@@ -121,7 +120,7 @@ colnames(l2g_combined) <- gsub("yProbaModel", "L2G", colnames(l2g_combined))
 write.table(l2g_combined, file = "/research/2023_polyQ/otg/data/polyQ_otg_29_09-23.tsv", sep = "\t", row.names = FALSE)
 l2g_combined <- fread("/research/2023_polyQ/otg/data/polyQ_otg_29_09-23.tsv")
 
-# Filter for select associations (remove count based, etc)
+# Filter for high confidence associations (remove count based, etc)
 l2g_combined_select <- l2g_combined %>% 
   filter(!(study.traitReported %like% " cell")) %>% 
   filter(!(study.traitReported %like% " count")) %>%
@@ -157,7 +156,6 @@ l2g_combined_sig %>%
   labs(x = "Gene",
        y ="Number of traits reported") +
   geom_text(aes(label = ..count..), stat = "count", vjust = -0.2, colour = "black", size = 3.5) +
-  #labs(title = "Total PolyQ L2G Studies")+
   theme(plot.title = element_text(hjust = 0.5, size = 9),
         axis.text.x = element_text(face = "bold.italic", angle = 90, size = 12),
         axis.text.y = element_text(face = "bold", size = 12),
@@ -265,7 +263,7 @@ node_colors <- c("ATXN1" = "#2c728e", "HTT" = "#472d7b", "ATXN2" = "#440154",
 node_degrees <- table(c(edge_df))
 node_degrees <- sort(node_degrees, decreasing = TRUE)
 
-# Scale degrees to a range between 1 and 
+# Scale degrees to a range between 1 and 5
 scaled_degrees <- (node_degrees - min(node_degrees)) / (max(node_degrees) - min(node_degrees)) * 4 + 1
 
 # Map the defined colors
@@ -290,7 +288,7 @@ arcplot(edge_df, col.arcs = hsv(0, 0, 0.2, 0.25),
 # Close the PDF device
 dev.off()
 
-## Plot the polyQ select and significat associations 
+## Plot the polyQ select and significant associations 
 ggplot(l2g_combined_select_sig, aes(fct_infreq(symbol,), fill = symbol)) +
   geom_bar(width = 0.4) + theme_minimal() + theme_bw() +
   scale_fill_manual(values=c("ATXN7" = "#28ae80","ATXN1" = "#2c728e","CACNA1A" = "#3b528b","HTT" = "#472d7b","ATXN2" = "#440154"))+
@@ -336,7 +334,7 @@ current <- current %>%
   slice_head(n = 1) %>%
   ungroup()
 
-# Plot the lollipop plot
+# Plot the lollipop graph
 current %>%
   group_by(symbol) %>%
   arrange(L2G) %>%   
