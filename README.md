@@ -8,6 +8,7 @@ This contains the R and BASH scripts and data required for the analyses performe
   - `polyQ_otg_29_09-23.tsv`: Data extracted from the Open Targets Genetic portal, specifically related to the polyglutamine disease genes (accessed January 24, 2024).
   - `polyQ_genes_molecular_interactions_interactors.txt`: IntAct molecular interaction data extracted from the Open Targets database for polyglutamine disease genes (Data extracted on October 25, 2024).
   - `proteinatlas.tsv`: *Not included.* Data from the Human Protein Atlas. Available from: [Download](https://www.proteinatlas.org/about/download)
+  - `polyQ_disorders_2023.xlsx`: *Not included.* Summary of the key information related to the polyglutamine disease genes.
 
 - `results/`: Contains figures generated from the analyses for the current study. 
 
