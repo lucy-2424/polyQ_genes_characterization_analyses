@@ -337,14 +337,16 @@ current <- current %>%
 # Plot the lollipop graph
 current %>%
   group_by(symbol) %>%
-  arrange(L2G) %>%   
-  mutate(study.traitReported = factor (study.traitReported, levels = study.traitReported)) %>%   # This trick update the factor levels
-  ggplot( aes(study.traitReported, L2G, color = symbol)) +
+  arrange(L2G) %>%  
+  mutate(
+    symbol = factor(symbol, levels = c("HTT", "CACNA1A", "ATXN7", "ATXN2", "ATXN1")),  
+    study.traitReported = factor(study.traitReported, levels = study.traitReported)) %>%   
+  ggplot(aes(study.traitReported, L2G, color = symbol)) +
   theme_minimal() + theme_bw() +
-  geom_segment( aes(x = study.traitReported, xend = study.traitReported, y = 0, yend = L2G)) +
-  geom_point( size = 2.6) +
+  geom_segment(aes(x = study.traitReported, xend = study.traitReported, y = 0, yend = L2G)) +
+  geom_point(size = 2.6) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "red", size = 0.4) +
-  scale_color_manual(values = c("ATXN7" = "#28ae80","ATXN1" = "#2c728e","CACNA1A" = "#3b528b","HTT" = "#472d7b","ATXN2" = "#440154")) +
+  scale_color_manual(values = c("ATXN7" = "#28ae80", "ATXN1" = "#2c728e", "CACNA1A" = "#3b528b", "HTT" = "#472d7b", "ATXN2" = "#440154")) +
   coord_flip() +
   labs(x = "Study traits reported") +
   labs(color = "Gene") + 

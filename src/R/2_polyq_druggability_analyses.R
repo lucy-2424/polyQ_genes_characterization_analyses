@@ -68,8 +68,157 @@ ggsave("/research/2023_polyQ/results/polyq_genes_tissue_specificity.pdf", height
 rm(polyq_genes_info_summary)
 
 # Assess and add interaction data from Open Targets
-# Subset high quality (mi score greater than 0.42)
-# Threshold based on https://doi.org/10.1101/2023.02.07.23285407
+# Subset high quality (mi score greater than 0.42, Threshold based on https://doi.org/10.1101/2023.02.07.23285407)
+# Retrieve polyQ gene ensembl ids
+ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl", archive=FALSE, verbose=TRUE)
+filters <- listFilters(ensembl)
+attributes <- listAttributes(ensembl)
+filterlist <- unique(polyq_genes_info$gene) 
+emsembl_gene_info <- getBM(attributes = c("hgnc_symbol","ensembl_gene_id"),filters = c("hgnc_symbol"),values = filterlist, mart = ensembl)
+polyq_genes_mi <- merge(polyq_genes_info, emsembl_gene_info, by.x="gene", by.y="hgnc_symbol", all.x=T)
+
+# Set up to query Open Targets Platform API
+otp_cli <- GraphqlClient$new(url = 'https://api.platform.opentargets.org/api/v4/graphql')
+otp_qry <- Query$new()
+otp_qry$query('intact_query', 'query InteractionsSectionQuery(
+  $ensgId: String!
+  $sourceDatabase: String
+  $index: Int = 0
+  $size: Int = 10
+) {
+  target(ensemblId: $ensgId) {
+    id
+    approvedName
+    approvedSymbol
+    interactions(
+      sourceDatabase: $sourceDatabase
+      page: { index: $index, size: $size }
+    ) {
+      count
+      rows {
+        intA
+        intABiologicalRole
+        targetA {
+          id
+          approvedSymbol
+        }
+        speciesA {
+          mnemonic
+        }
+        intB
+        intBBiologicalRole
+        targetB {
+          id
+          approvedSymbol
+        }
+        speciesB {
+          mnemonic
+        }
+        score
+        count
+        sourceDatabase
+        evidences {
+          evidenceScore
+          hostOrganismScientificName
+          interactionDetectionMethodMiIdentifier
+          interactionDetectionMethodShortName
+          interactionIdentifier
+          interactionTypeShortName
+          participantDetectionMethodA {
+            miIdentifier
+            shortName
+          }
+          participantDetectionMethodB {
+            miIdentifier
+            shortName
+          }
+          interactionDetectionMethodShortName
+          expansionMethodShortName
+          pubmedId
+        }
+      }
+    }
+  }
+}')
+
+# Execute the query 
+variables <- list(ensgId= c("ENSG00000066427, ENSG00000111676, ENSG00000112592,
+                            ENSG00000124788, ENSG00000141837, ENSG00000163635,
+                            ENSG00000168286, ENSG00000169083, ENSG00000197386,
+                            ENSG00000204842"),
+                  sourceDatabase= c("intact"),
+                  index= c(Int=0),
+                  size= c(Int=1000))
+(otp_cli$exec(otp_qry$queries$intact_query, variables, flatten = TRUE))
+
+# JSON arrays automatically convert list into more specific R class using the function "fromJSON"
+result <- fromJSON(otp_cli$exec(otp_qry$queries$intact_query, variables, flatten = TRUE))$data
+result_df <- as.data.frame(result) %>% flatten()
+
+# Write a function that fetches intact information for genes
+# Use this later to automate as you can only fetch one gene at a time
+fetch_intact <- function(current_ensgId) {
+  variables = list(ensgId= current_ensgId,
+                   sourceDatabase= c("intact"),
+                   index= c(Int=0),
+                   size= c(Int=1000))
+  result_gene <- fromJSON(otp_cli$exec(otp_qry$queries$intact_query, variables, flatten = TRUE))$data
+  if (!is.null(result_gene[["target"]][["interactions"]])){
+    #result_gene_df <- lapply(result_gene,as.data.frame)
+    result_gene_df <- as.data.frame(result_gene) %>% dplyr::select(target.interactions.rows.score, target.approvedSymbol)
+    return(result_gene_df)
+  }
+}
+
+# Extract intact info for all genes of interest
+query_genes <- polyq_genes_info$ensembl_gene_id
+query_genes <- na.omit(query_genes)
+
+intact_combined <- NULL
+for (hgnc_symbol in query_genes) {
+  print(hgnc_symbol)
+  temp_intact <- fetch_intact(hgnc_symbol)
+  print("binding")
+  intact_combined <- rbind(intact_combined, temp_intact)
+}
+
+
+# Incase you want to download all information without intializing rows otherwise skip
+for (hgnc_symbol in query_genes) {
+  print(hgnc_symbol)
+  temp_intact <- fetch_intact(hgnc_symbol)
+  
+  print("binding")
+  
+  # Use dplyr's bind_rows to avoid row name issues
+  intact_combined <- bind_rows(intact_combined, temp_intact)
+}
+otg_interactors <- as.data.frame(intact_combined)
+
+# Clean the data and retain the relevant information
+otg_interactors <- otg_interactors %>%
+  dplyr::select(c(target.interactions.rows.targetB, target.interactions.rows.score, 
+                  target.interactions.rows.intABiologicalRole, target.interactions.rows.intBBiologicalRole,
+                  target.interactions.rows.count, target.approvedSymbol))
+
+otg_interactors$target.interactions.rows.intABiologicalRole <- paste0("A:", otg_interactors$target.interactions.rows.intABiologicalRole)
+otg_interactors$target.interactions.rows.intBBiologicalRole <- paste0("B:", otg_interactors$target.interactions.rows.intBBiologicalRole)
+
+otg_interactors$biologicalRole <- paste(otg_interactors$target.interactions.rows.intABiologicalRole,
+                                        otg_interactors$target.interactions.rows.intBBiologicalRole,
+                                        sep = ", ")
+rename(data, new_name = old_name)
+otg_interactors <- otg_interactors %>%
+  rename(interactorB = target.interactions.rows.targetB,
+         score = target.interactions.rows.score,
+         interactionEvidenceEntries = target.interactions.rows.count,
+         gene = target.approvedSymbol) %>%
+  dplyr::select(!c(target.interactions.rows.intABiologicalRole, target.interactions.rows.intBBiologicalRole))
+
+# Save the reference data 
+# Data downloaded 2024-10-23
+write.table(otg_interactors, file = "/research/2023_polyQ/otg/data/polyQ_genes_molecular_interactions_interactors.txt", sep = "\t", row.names = FALSE)
+
 otg_interactors <- fread("/research/2023_polyQ/data/polyQ_genes_molecular_interactions_interactors.txt")
 
 polyq_int_high_q_count <- otg_interactors %>%
