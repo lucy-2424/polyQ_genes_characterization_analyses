@@ -155,8 +155,7 @@ variables <- list(ensgId= c("ENSG00000066427, ENSG00000111676, ENSG00000112592,
 result <- fromJSON(otp_cli$exec(otp_qry$queries$intact_query, variables, flatten = TRUE))$data
 result_df <- as.data.frame(result) %>% flatten()
 
-# Write a function that fetches intact information for genes
-# Use this later to automate as you can only fetch one gene at a time
+# Write a function that fetches intact information for genes to use later to automate as you can only fetch one gene at a time
 fetch_intact <- function(current_ensgId) {
   variables = list(ensgId= current_ensgId,
                    sourceDatabase= c("intact"),
@@ -164,8 +163,7 @@ fetch_intact <- function(current_ensgId) {
                    size= c(Int=1000))
   result_gene <- fromJSON(otp_cli$exec(otp_qry$queries$intact_query, variables, flatten = TRUE))$data
   if (!is.null(result_gene[["target"]][["interactions"]])){
-    #result_gene_df <- lapply(result_gene,as.data.frame)
-    result_gene_df <- as.data.frame(result_gene) %>% dplyr::select(target.interactions.rows.score, target.approvedSymbol)
+    result_gene_df <- as.data.frame(result_gene) 
     return(result_gene_df)
   }
 }
@@ -182,17 +180,6 @@ for (hgnc_symbol in query_genes) {
   intact_combined <- rbind(intact_combined, temp_intact)
 }
 
-
-# Incase you want to download all information without intializing rows otherwise skip
-for (hgnc_symbol in query_genes) {
-  print(hgnc_symbol)
-  temp_intact <- fetch_intact(hgnc_symbol)
-  
-  print("binding")
-  
-  # Use dplyr's bind_rows to avoid row name issues
-  intact_combined <- bind_rows(intact_combined, temp_intact)
-}
 otg_interactors <- as.data.frame(intact_combined)
 
 # Clean the data and retain the relevant information
@@ -215,8 +202,7 @@ otg_interactors <- otg_interactors %>%
          gene = target.approvedSymbol) %>%
   dplyr::select(!c(target.interactions.rows.intABiologicalRole, target.interactions.rows.intBBiologicalRole))
 
-# Save the reference data 
-# Data downloaded 2024-10-23
+# Save the reference data (Data downloaded 2024-10-23)
 write.table(otg_interactors, file = "/research/2023_polyQ/otg/data/polyQ_genes_molecular_interactions_interactors.txt", sep = "\t", row.names = FALSE)
 
 otg_interactors <- fread("/research/2023_polyQ/data/polyQ_genes_molecular_interactions_interactors.txt")
